@@ -50,7 +50,7 @@ export const SIDE_MENU_USER_DATA = [
     id: "02",
     label: "My Tasks",
     icon: LuClipboardCheck,
-    to: "/user/tasks",
+    to: "/user/my-tasks",
   },
   {
     id: "05",

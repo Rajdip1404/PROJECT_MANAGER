@@ -101,6 +101,10 @@ const createTask = async (req, res) => {
         .json({ message: "AssignedTo must be an array of user IDs" });
     }
 
+    if(dueDate && new Date(dueDate) < new Date()) {
+      return res.status(400).json({ message: "Due date cannot be in the past" });
+    }
+
     const task = new Task({
       title,
       description,
@@ -246,7 +250,7 @@ const getDashboardData = async (req, res) => {
     const totalTasks = await Task.countDocuments();
     const completedTasks = await Task.countDocuments({ status: "Completed" });
     const inProgressTasks = await Task.countDocuments({
-      status: "In-Progress",
+      status: "In Progress",
     });
     const pendingTasks = await Task.countDocuments({ status: "Pending" });
     const overDueTasks = await Task.countDocuments({
@@ -254,7 +258,7 @@ const getDashboardData = async (req, res) => {
       dueDate: { $lt: new Date() },
     });
 
-    const taskStatuses = ["Pending", "In-Progress", "Completed"];
+    const taskStatuses = ["Pending", "In Progress", "Completed"];
     const taskDistributionRaw = await Task.aggregate([
       {
         $group: {
@@ -271,7 +275,7 @@ const getDashboardData = async (req, res) => {
     }, {});
     taskDistribution["All"] = totalTasks;
 
-    const taskPriorities = ["Low", "Medium", "High"];
+    const taskPriorities = ["low", "medium", "high"];
     const taskPriorityLevelsRaw = await Task.aggregate([
       {
         $group: {
@@ -290,7 +294,7 @@ const getDashboardData = async (req, res) => {
     const recentTasks = await Task.find()
       .sort({ createdAt: -1 })
       .limit(10)
-      .select("title staus priority dueDate createdAt");
+      .select("title status priority dueDate createdAt");
 
     res.status(200).json({
       statistics: {
@@ -322,7 +326,7 @@ const getUserDashboardData = async (req, res) => {
     });
     const inProgressTasks = await Task.countDocuments({
       assignedTo: userId,
-      status: "In-Progress",
+      status: "In Progress",
     });
     const pendingTasks = await Task.countDocuments({
       assignedTo: userId,
@@ -334,7 +338,7 @@ const getUserDashboardData = async (req, res) => {
       dueDate: { $lt: new Date() },
     });
 
-    const taskStatuses = ["Pending", "In-Progress", "Completed"];
+    const taskStatuses = ["Pending", "In Progress", "Completed"];
     const taskDistributionRaw = await Task.aggregate([
       {
         $match: { assignedTo: userId },
@@ -354,7 +358,7 @@ const getUserDashboardData = async (req, res) => {
     }, {});
     taskDistribution["All"] = totalTasks;
 
-    const taskPriorities = ["Low", "Medium", "High"];
+    const taskPriorities = ["low", "medium", "high"];
     const taskPriorityLevelsRaw = await Task.aggregate([
       {
         $match: { assignedTo: userId },
@@ -376,7 +380,7 @@ const getUserDashboardData = async (req, res) => {
     const recentTasks = await Task.find({ assignedTo: userId })
       .sort({ createdAt: -1 })
       .limit(10)
-      .select("title staus priority dueDate createdAt");
+      .select("title status priority dueDate createdAt");
 
     res.status(200).json({
       statistics: {

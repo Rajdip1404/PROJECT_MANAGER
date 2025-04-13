@@ -22,7 +22,7 @@ const Navbar = ({ activeMenu }) => {
       <h2 className="text-lg font-medium text-black">Project Manager</h2>
 
       {openSideMenu && (
-        <div className="fixed top-[61px] -ml-4 bg-white">
+        <div className="fixed top-[61px] -ml-7 bg-white">
           <SideMenu activeMenu={activeMenu} />
         </div>
       )}
